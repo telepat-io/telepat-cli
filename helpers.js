@@ -60,7 +60,9 @@ function setEnvKey(key, value) {
 }
 
 function retrieveEnv() {
-	return JSON.parse(localStorage.getItem('env_vars'));
+	var env_vars = localStorage.getItem('env_vars');
+	if(env_vars === null) return {};
+	return JSON.parse(env_vars);
 }
 
 function login(email, password, callback) {

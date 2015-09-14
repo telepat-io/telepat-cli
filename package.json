@@ -1,6 +1,6 @@
 {
   "name": "telepat-cli",
-  "version": "0.1.1",
+  "version": "0.1.1-a",
   "description": "A CLI tool for working with a Telepat instance",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,9 +23,9 @@
     "index.js",
     "helpers.js"
   ],
-  "_id": "telepat-cli@0.1.1",
-  "_shasum": "6b26c87d69e4d60fb24c439110c4a9bc861270df",
-  "_from": "telepat-cli@*",
+  "_id": "telepat-cli@0.1.1-a",
+  "_shasum": "e11ae3daac409ab624dc98e290e0d3fe33cbeebe",
+  "_from": "telepat-cli@0.1.1-a",
   "_npmVersion": "1.4.28",
   "_npmUser": {
     "name": "telepat",
@@ -38,9 +38,9 @@
     }
   ],
   "dist": {
-    "shasum": "6b26c87d69e4d60fb24c439110c4a9bc861270df",
-    "tarball": "http://registry.npmjs.org/telepat-cli/-/telepat-cli-0.1.1.tgz"
+    "shasum": "e11ae3daac409ab624dc98e290e0d3fe33cbeebe",
+    "tarball": "http://registry.npmjs.org/telepat-cli/-/telepat-cli-0.1.1-a.tgz"
   },
   "directories": {},
-  "_resolved": "https://registry.npmjs.org/telepat-cli/-/telepat-cli-0.1.1.tgz"
+  "_resolved": "https://registry.npmjs.org/telepat-cli/-/telepat-cli-0.1.1-a.tgz"
 }
