@@ -1,0 +1,46 @@
+{
+  "name": "telepat-cli",
+  "version": "0.1.1",
+  "description": "A CLI tool for working with a Telepat instance",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "telepat"
+  ],
+  "author": {
+    "name": "Andrei Marinescu"
+  },
+  "license": "Apache 2.0",
+  "preferGlobal": true,
+  "bin": {
+    "telepat": "index.js"
+  },
+  "dependencies": {
+    "node-localstorage": "0.6.0"
+  },
+  "files": [
+    "index.js",
+    "helpers.js"
+  ],
+  "_id": "telepat-cli@0.1.1",
+  "_shasum": "6b26c87d69e4d60fb24c439110c4a9bc861270df",
+  "_from": "telepat-cli@*",
+  "_npmVersion": "1.4.28",
+  "_npmUser": {
+    "name": "telepat",
+    "email": "dev@telepat.io"
+  },
+  "maintainers": [
+    {
+      "name": "telepat",
+      "email": "dev@telepat.io"
+    }
+  ],
+  "dist": {
+    "shasum": "6b26c87d69e4d60fb24c439110c4a9bc861270df",
+    "tarball": "http://registry.npmjs.org/telepat-cli/-/telepat-cli-0.1.1.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/telepat-cli/-/telepat-cli-0.1.1.tgz"
+}
