@@ -1,15 +1,12 @@
 var http = require('http');
 var environment=undefined;
 
-if (typeof localStorage === "undefined" || localStorage === null) {
+if (typeof ls === "undefined" || ls === null) {
   var LocalStorage = require('node-localstorage').LocalStorage;
-  localStorage = new LocalStorage(__dirname+'/settings-storage');
+  ls = new LocalStorage(__dirname+'/settings-storage');
 }
- 
-// localStorage.setItem('myFirstKey', 'myFirstValue');
-// console.log(localStorage.getItem('myFirstKey'));
 
-function doRequest(path, post_data, callback, app_id) {
+function doTelepatRequest(path, post_data, callback, app_id) {
 	if(environment===undefined) return;
 
 	// An object of options to indicate where to post to
@@ -32,17 +29,22 @@ function doRequest(path, post_data, callback, app_id) {
 		post_options.headers["X-BLGREQ-APPID"] = app_id;
 	}
 
+	doRequest(post_options, post_data, callback);
+}
+
+function doRequest(post_options, post_data, callback) {
 	// Set up the request
 	var post_req = http.request(post_options, function(res) {
-	  res.setEncoding('utf8');
-	  if(callback!==undefined) res.on('data', function (chunk) {
-	  		callback(JSON.parse(chunk));
-	  });
-	  else {
-	    res.on('data', function (chunk) {
-	      console.log('Response: ' + chunk);
-	    });
-	  }
+		res.setEncoding('utf8');
+		if(callback!==undefined) res.on('data', function (chunk) {
+			//console.log(chunk);
+			callback(JSON.parse(chunk));
+		});
+		else {
+			res.on('data', function (chunk) {
+				console.log('Response: ' + chunk);
+			});
+		}
 	});
 
 	// post the data
@@ -56,11 +58,11 @@ function setEnv(env) {
 
 function setEnvKey(key, value) {
 	environment[key] = value;
-	localStorage.setItem("env_vars", JSON.stringify(environment));
+	ls.setItem("env_vars", JSON.stringify(environment));
 }
 
 function retrieveEnv() {
-	var env_vars = localStorage.getItem('env_vars');
+	var env_vars = ls.getItem('env_vars');
 	if(env_vars === null) return {};
 	return JSON.parse(env_vars);
 }
@@ -70,10 +72,11 @@ function login(email, password, callback) {
 	  'email' : email,
 	  'password': password
 	});
-	doRequest("/admin/login", post_data, function(parsedResponse) {
+	doTelepatRequest("/admin/login", post_data, function(parsedResponse) {
 		if(parsedResponse.status==200) {
 			environment.jwt = parsedResponse.content.token;
-			localStorage.setItem('env_vars', JSON.stringify(environment));
+			ls.setItem('env_vars', JSON.stringify(environment));
+            console.log("Admin login OK.");
 			if(callback!==undefined) callback();
 		}
 		else 
@@ -81,6 +84,7 @@ function login(email, password, callback) {
 	});
 }
 
+exports.doTelepatRequest=doTelepatRequest;
 exports.doRequest=doRequest;
 exports.setEnv=setEnv;
 exports.setEnvKey=setEnvKey;

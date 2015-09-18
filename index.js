@@ -1,8 +1,8 @@
 #! /usr/bin/env node
 
-//Adding some dependencies for making HTTP requests
-var helpers = require( __dirname + '/helpers.js');
 var fs = require( 'fs');
+var helpers = require( __dirname + '/helpers.js');
+//var telepat = require( __dirname+'/telepat_integration.js');
 
 var env_data = helpers.retrieveEnv();
 //valid env fields: telepat_host, telepat_port, jwt
@@ -21,7 +21,7 @@ switch(mainAction) {
 				var email = userArgs[2];
 				var password = userArgs[3];
 				if(email === undefined || password === undefined) {
-					console.log("Email and password requred");
+					console.log("Email and password required");
 					return;
 				}
 				// Build the post string from an object
@@ -29,11 +29,13 @@ switch(mainAction) {
 				  'email' : email,
 				  'password': password
 				});
-				helpers.doRequest("/admin/add", post_data, function() {
+				helpers.doTelepatRequest("/admin/add", post_data, function() {
 					console.log("Admin created. Trying to log in...");
 					helpers.setEnvKey("email", email);
 					helpers.setEnvKey("password", password);
-					helpers.login(email, password);
+                    setTimeout(function() {
+                        helpers.login(email, password);
+                    }, 1000);
 				});
 
 				break;
@@ -54,8 +56,8 @@ switch(mainAction) {
 					"keys": keys
 				}
 				helpers.login(env_data.email, env_data.password, function() {
-					helpers.doRequest("/admin/app/add", JSON.stringify(post_data), function(response) {
-						var appId = Object.keys(response.content)[0];
+					helpers.doTelepatRequest("/admin/app/add", JSON.stringify(post_data), function(response) {
+						var appId = response.content.id;
 						// helpers.setEnvKey("app_id", appId);
 						console.log("Added app with ID: " + appId);
 					});
@@ -74,9 +76,11 @@ switch(mainAction) {
 					"name" : name,
 					"state" : 0
 				}
-				helpers.doRequest("/admin/context/add", JSON.stringify(post_data), undefined, appId);
+				helpers.doTelepatRequest("/admin/context/add", JSON.stringify(post_data), function(response) {
+                    console.log("Context created");
+                }, appId);
 				break;
-			default: 
+			default:
 				console.log("Unknown add parameter. Valid ones are: admin, app, context");
 		}
 		break;
@@ -104,7 +108,7 @@ switch(mainAction) {
 				  }
 				  // Make sure there's data before we post it
 				  if(data) {
-				  	helpers.doRequest("/admin/schema/update", data, function() {
+				  	helpers.doTelepatRequest("/admin/schema/update", data, function() {
 				  		console.log("Application schema updated");
 				  	}, appId);
 				  }
@@ -114,7 +118,7 @@ switch(mainAction) {
 				  }
 				});
 				break;
-			default: 
+			default:
 				if(userArgs[2]===undefined) {
 					console.log("Parameter value required");
 					return;
@@ -124,6 +128,47 @@ switch(mainAction) {
 
 		}
 		break;
+	case "configure":
+        var entity = userArgs[1];
+        switch(entity) {
+            case "elasticsearch":
+                // An object of options to indicate where to post to
+                var post_options = {
+                    host: env_data.elasticsearch_host===undefined?'127.0.0.1':environment.elasticsearch_host,
+                    port: env_data.elasticsearch_port===undefined?'9200':environment.elasticsearch_port,
+                    path: '/default',
+                    method: 'POST'
+                };
+                var post_data = JSON.stringify({
+                    "mappings": {
+                        "_default_": {
+                            "dynamic_templates": [
+                                {
+                                    "string_template": {
+                                        "mapping": {
+                                            "index": "not_analyzed",
+                                            "type": "string"
+                                        },
+                                        "match_mapping_type": "string",
+                                        "match": "*"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "settings": {
+                        "index": {
+                            "number_of_replicas": "1",
+                            "number_of_shards": "1"
+                        }
+                    }
+                });
+                helpers.doRequest(post_options,post_data);
+                break;
+            default:
+                console.log("Unknown configure argument.")
+        }
+		break;
 	default:
-		console.log("Unknown command. Valid actions are: add, set");
+		console.log("Unknown command. Valid actions are: add, set, configure");
 }
