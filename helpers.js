@@ -1,5 +1,14 @@
 var http = require('http');
-var environment=undefined;
+var environment={
+	telepat_host: undefined,
+	telepat_port: undefined,
+	elasticsearch_host: undefined,
+	elasticsearch_port: undefined,
+    jwt: undefined,
+    email: undefined,
+    password: undefined
+};
+var ls;
 
 if (typeof ls === "undefined" || ls === null) {
   var LocalStorage = require('node-localstorage').LocalStorage;
@@ -8,7 +17,6 @@ if (typeof ls === "undefined" || ls === null) {
 
 function doTelepatRequest(path, post_data, callback, app_id) {
 	if(environment===undefined) return;
-
 	// An object of options to indicate where to post to
 	var post_options = {
 	  host: environment.telepat_host,
@@ -34,12 +42,18 @@ function doTelepatRequest(path, post_data, callback, app_id) {
 
 function doRequest(post_options, post_data, callback) {
 	// Set up the request
+	if(post_options.host===undefined) {
+		console.log("No hostname was set");
+		return;
+	}
 	var post_req = http.request(post_options, function(res) {
 		res.setEncoding('utf8');
-		if(callback!==undefined) res.on('data', function (chunk) {
-			//console.log(chunk);
-			callback(JSON.parse(chunk));
-		});
+		if(callback!==undefined && callback!==null) {
+			res.on('data', function (chunk) {
+				//console.log(chunk);
+				callback(JSON.parse(chunk));
+			});
+		}
 		else {
 			res.on('data', function (chunk) {
 				console.log('Response: ' + chunk);
@@ -47,6 +61,9 @@ function doRequest(post_options, post_data, callback) {
 		}
 	});
 
+	post_req.on('error', function () {
+		console.log('Unable to complete HTTP request');
+	});
 	// post the data
 	post_req.write(post_data);
 	post_req.end();
@@ -63,8 +80,9 @@ function setEnvKey(key, value) {
 
 function retrieveEnv() {
 	var env_vars = ls.getItem('env_vars');
-	if(env_vars === null) return {};
-	return JSON.parse(env_vars);
+	if(env_vars === null) env_vars = "{}";
+	environment = JSON.parse(env_vars);
+	return environment;
 }
 
 function login(email, password, callback) {

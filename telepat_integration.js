@@ -2,62 +2,61 @@ var telepatJS = require('telepat-js');
 var Telepat = new telepatJS();
 
 var eventChannel;
-var model = 'events';
+//var model = 'events';
+var environment = null;
 var connectOptions = {
-    apiKey: '1234key',
-    appId: 1,
-    apiEndpoint: 'http://localhost:3000',
-    socketEndpoint: 'http://localhost',
+    apiKey: null,
+    appId: null,
+    apiEndpoint: null,
+    socketEndpoint: null,
     timerInterval: 150
 };
+var connected = false;
 
-Telepat.setLogLevel('debug');
-
-Telepat.on('login', function () {
-    $('#message').html("");
-    //subscribe();
-});
+//Telepat.setLogLevel('debug');
 
 Telepat.on('logout', function () {
-    console.log("logged out");
+    console.log("User logged out.");
 });
 
 Telepat.on('connect', function () {
     console.log("Connected to Telepat instance");
-    //subscribe();
+    connected = true;
 });
 
 Telepat.on('contexts-update', function () {
     console.log("Contexts retrieved");
-    subscribe();
 });
 
-connect();
 
-function connect() {
+function connect(appId, apiKey) {
+    if(environment==null) {
+        console.log("Environment configuration error");
+        return;
+    }
+    connectOptions.appId = appId;
+    connectOptions.apiKey = apiKey;
+    connectOptions.apiEndpoint = "http://"+environment.telepat_host+":"+environment.telepat_port;
+    connectOptions.socketEndpoint = "http://"+environment.telepat_host;
     Telepat.connect(connectOptions);
 }
 
-function addObject() {
-    eventChannel.objects['new'] = {
-        text: 'Hello world'
-    };
-}
+//function addObject() {
+//    eventChannel.objects['new'] = {
+//        text: 'Hello world'
+//    };
+//}
+//
+//function removeObject(id) {
+//    delete eventChannel.objects[id];
+//}
+//
+//function editObject(id) {
+//    eventChannel.objects[id].text = $('#' + id + '_input').val();
+//}
 
-function removeObject(id) {
-    delete eventChannel.objects[id];
-}
-
-function editObject(id) {
-    eventChannel.objects[id].text = $('#' + id + '_input').val();
-}
-
-function appendToList(key, value) {
-    $('.list-group').append('<li class="list-group-item" id="' + key + '">' + key + ': <input type="text" id="' + key + '_input" value="' + value.text + '" onkeyup="editObject(\'' + key + '\');"> <span id="' + key + '_span">' + value.text + '</span><div style="float:right"><a class="btn btn-default btn-sm" href="#" onclick="removeObject(\'' + key + '\'); return false;">Delete</a></div></li>');
-}
-
-function subscribe() {
-    eventChannel = Telepat.subscribe({ channel: { context: Telepat.contexts[0].id, model: model }}, function () {
+function subscribe(contextId, modelName) {
+    eventChannel = Telepat.subscribe({ channel: { context: contextId, model: modelName }}, function () {
         console.log(JSON.stringify(eventChannel.objects))   ;
     });
     eventChannel.on('update', function (operation, parentId, parentObject, delta) {
@@ -75,27 +74,12 @@ function subscribe() {
     });
 }
 
-exports.hangOnTillExit = hangOnTillExit
-function hangOnTillExit(fun){
-    process.stdin.resume()
-    'SIGINT SIGTERM SIGHUP exit'.split(' ').forEach(function(evt){
-        process.on(evt, function(){
-            process.stdin.pause()
-            fun()
-        })
-    })
+function passEnvironment(env) {
+    environment = env;
 }
 
-exports.exitIfErrorElse = exitIfErrorElse
-function exitIfErrorElse(callback){
-    return function(err){
-        if (err){
-            console.error(err.message)
-            return process.exit(1)
-        }
-        var args = Array.prototype.slice.call(arguments, 1)
-        callback.apply(this, args)
-    }
-}
-
-exitIfErrorElse();
+exports.TelepatClient = Telepat;
+exports.connected = connected;
+exports.connect = connect;
+exports.subscribe = subscribe;
+exports.passEnvironment = passEnvironment;
