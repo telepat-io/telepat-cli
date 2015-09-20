@@ -6,7 +6,12 @@ var environment={
 	elasticsearch_port: undefined,
     jwt: undefined,
     email: undefined,
-    password: undefined
+    password: undefined,
+    telepat_user: undefined,
+    telepat_user_password: undefined,
+	appId: undefined,
+	apiKey: undefined,
+	contextId: undefined
 };
 var ls;
 
@@ -102,9 +107,18 @@ function login(email, password, callback) {
 	});
 }
 
+function retrieveArgument(needle, haystack) {
+	var value = haystack['needle'];
+	if(value === undefined && environment['needle']!==undefined) {
+		value = environment['needle'];
+	}
+	return value;
+}
+
 exports.doTelepatRequest=doTelepatRequest;
 exports.doRequest=doRequest;
 exports.setEnv=setEnv;
 exports.setEnvKey=setEnvKey;
 exports.retrieveEnv=retrieveEnv;
 exports.login=login;
+exports.retrieveArgument=retrieveArgument;

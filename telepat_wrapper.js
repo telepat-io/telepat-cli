@@ -2,7 +2,6 @@ var telepatJS = require('telepat-js');
 var Telepat = new telepatJS();
 
 var eventChannel;
-//var model = 'events';
 var environment = null;
 var connectOptions = {
     apiKey: null,
