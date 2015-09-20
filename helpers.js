@@ -20,17 +20,18 @@ if (typeof ls === "undefined" || ls === null) {
   ls = new LocalStorage(__dirname+'/settings-storage');
 }
 
-function doTelepatRequest(path, post_data, callback, app_id) {
+function doTelepatRequest(path, post_data, callback, app_id, method) {
 	if(environment===undefined) return;
+	if(method===undefined) method = 'POST';
 	// An object of options to indicate where to post to
 	var post_options = {
 	  host: environment.telepat_host,
 	  port: environment.telepat_port,
 	  path: path,
-	  method: 'POST',
+	  method: method,
 	  headers: {
-	      'Content-Type': 'application/json',
-	      'Content-Length': post_data.length
+	      'Content-Type': 'application/json'
+	      //'Content-Length': post_data.length
 	  }
 	};
 
@@ -70,7 +71,8 @@ function doRequest(post_options, post_data, callback) {
 		console.log('Unable to complete HTTP request');
 	});
 	// post the data
-	post_req.write(post_data);
+	if(post_data!==null)
+		post_req.write(post_data);
 	post_req.end();
 }
 

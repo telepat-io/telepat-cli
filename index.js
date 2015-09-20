@@ -177,6 +177,13 @@ switch(mainAction) {
             case "configs":
                 console.log(JSON.stringify(env_data, null, 2));
                 break;
+            case "apps":
+                helpers.login(env_data.email, env_data.password, function() {
+                    helpers.doTelepatRequest("/admin/apps", null, function(response) {
+                        console.log(response.content);
+                    }, null, 'GET');
+                });
+                break;
             default:
                 console.log("Unknown parameter for list.");
         }
