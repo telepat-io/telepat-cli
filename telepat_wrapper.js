@@ -12,7 +12,7 @@ var connectOptions = {
 };
 var connected = false;
 
-//Telepat.setLogLevel('debug');
+Telepat.setLogLevel('debug');
 
 Telepat.on('logout', function () {
     console.log("User logged out.");
@@ -26,7 +26,6 @@ Telepat.on('connect', function () {
 Telepat.on('contexts-update', function () {
     console.log("Contexts retrieved");
 });
-
 
 function connect(appId, apiKey) {
     if(environment==null) {

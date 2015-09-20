@@ -48,13 +48,17 @@ switch(mainAction) {
 				break;
             case "user":
                 appId = helpers.retrieveArgument('appId', arguments);
+                console.log("appId: "+appId);
                 apiKey = helpers.retrieveArgument('apiKey', arguments);
-                email = helpers.retrieveArgument('email', arguments);
-                password = helpers.retrieveArgument('password', arguments);
+                console.log("apiKey: "+apiKey);
+                email = helpers.retrieveArgument('telepat_user', arguments);
+                console.log("email: "+email);
+                password = helpers.retrieveArgument('telepat_user_password', arguments);
+                console.log("password: "+password);
                 name = arguments.name;
 
                 if(appId===undefined || apiKey === undefined || email===undefined || password===undefined || name===undefined) {
-                    console.log("appID, apiKey, email, password and name are required");
+                    console.log("appId, apiKey, email, password and name are required");
                     return;
                 }
 
@@ -64,6 +68,7 @@ switch(mainAction) {
                     'name': name
                 });
                 TelepatWrapper.TelepatClient.on("connect", function() {
+                    console.log(userProfile);
                     TelepatWrapper.TelepatClient.user.register(userProfile, function () {
                         console.log("User created");
                         TelepatWrapper.TelepatClient.disconnect();
@@ -78,6 +83,11 @@ switch(mainAction) {
 					return;
 				}
 				var keys = arguments.apiKey;
+                console.log(typeof  keys);
+                if(typeof keys == 'string') {
+                    keys = [keys];
+                }
+
 				post_data = {
 					"name": name,
 					"keys": keys
@@ -103,9 +113,12 @@ switch(mainAction) {
 					"name" : contextName,
 					"state" : 0
 				};
-				helpers.doTelepatRequest("/admin/context/add", JSON.stringify(post_data), function() {
-                    console.log("Context created");
-                }, appId);
+                helpers.login(env_data.email, env_data.password, function() {
+                    helpers.doTelepatRequest("/admin/context/add", JSON.stringify(post_data), function (response) {
+                        console.log("Context created: "+JSON.stringify(response.content.id, null, 2));
+                        helpers.setEnvKey("contextId", response.content.id);
+                    }, appId);
+                });
 				break;
 			default:
 				console.log("Unknown add parameter. Valid ones are: admin, app, context");
@@ -183,6 +196,21 @@ switch(mainAction) {
                         console.log(response.content);
                     }, null, 'GET');
                 });
+                break;
+            case "contexts":
+                appId = helpers.retrieveArgument('appId', arguments);
+                apiKey = helpers.retrieveArgument('apiKey', arguments);
+
+                if(appId===undefined || apiKey === undefined) {
+                    console.log("appId, apiKey are required");
+                    return;
+                }
+
+                TelepatWrapper.TelepatClient.on('contexts-update', function () {
+                    console.log(JSON.stringify(TelepatWrapper.TelepatClient.contexts, null, 2));
+                    TelepatWrapper.TelepatClient.disconnect();
+                });
+                TelepatWrapper.connect(appId, apiKey);
                 break;
             default:
                 console.log("Unknown parameter for list.");

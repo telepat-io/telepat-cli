@@ -110,9 +110,9 @@ function login(email, password, callback) {
 }
 
 function retrieveArgument(needle, haystack) {
-	var value = haystack['needle'];
-	if(value === undefined && environment['needle']!==undefined) {
-		value = environment['needle'];
+	var value = haystack[needle];
+	if(value === undefined && environment[needle]!==undefined) {
+		value = environment[needle];
 	}
 	return value;
 }
