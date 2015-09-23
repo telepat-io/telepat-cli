@@ -20,32 +20,43 @@ SetController.prototype.unknownAction = function(route, action) {
 
 exports.SetController = SetController;
 
-SetController.prototype.schema = function () {
+SetController.prototype.schema = function (callback) {
     var appId = this.helpers.retrieveArgument('appId', this.arguments);
     var schemaFile = this.arguments.filename;
+    var schemaData = this.arguments.schemaData;
 
-    if(appId===undefined || schemaFile===undefined) {
-        console.log("appId and filename required");
+    if(appId===undefined || (schemaData===undefined && schemaFile===undefined)) {
+        console.log("appId and filename or schemaData required");
         return;
     }
 
     var self=this;
-
-    fs.readFile(schemaFile, 'utf-8', function (err, data) {
-        if (err) {
-            console.log('FATAL An error occurred trying to read in the file: ' + err);
-            process.exit(-2);
-        }
-        // Make sure there's data before we post it
-        if(data) {
-            self.helpers.doTelepatRequest("/admin/schema/update", data, function() {
-                console.log("Application schema updated");
-            }, appId);
-        }
-        else {
-            console.log("No data to post");
-            process.exit(-1);
-        }
-    });
+    if(schemaFile !== undefined) {
+        fs.readFile(schemaFile, 'utf-8', function (err, data) {
+            if (err) {
+                console.log('FATAL An error occurred trying to read in the file: ' + err);
+                if(callback!==undefined) callback();
+                process.exit(-2);
+            }
+            // Make sure there's data before we post it
+            if (data) {
+                data = data.replace('"appId": 1', '"appId": "'+appId+'"');
+                self.helpers.doTelepatRequest("/admin/schema/update", data, function () {
+                    console.log("Application schema updated");
+                    if(callback!==undefined) callback();
+                }, appId);
+            }
+            else {
+                console.log("No data to post");
+                if(callback!==undefined) callback();
+                process.exit(-1);
+            }
+        });
+    } else {
+        self.helpers.doTelepatRequest("/admin/schema/update", schemaData, function () {
+            console.log("Application schema updated");
+            if(callback!==undefined) callback();
+        }, appId);
+    }
 };
 

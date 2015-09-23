@@ -9,7 +9,7 @@ var SubscribeController = function(helpers, arguments, environment, mainControll
 SubscribeController.prototype = Object.create(BaseController.prototype);
 SubscribeController.prototype.constructor = SubscribeController;
 
-SubscribeController.prototype.respond = function (action) {
+SubscribeController.prototype.respond = function (action, callback) {
     var appId = this.helpers.retrieveArgument('appId', this.arguments);
     var apiKey = this.helpers.retrieveArgument('apiKey', this.arguments);
     var contextId = this.helpers.retrieveArgument('contextId', this.arguments);
@@ -31,6 +31,9 @@ SubscribeController.prototype.respond = function (action) {
     TelepatWrapper.TelepatClient.on("login", function() {
         console.log("Logged in. Subscribing to channel");
         TelepatWrapper.subscribe(contextId, modelName);
+    });
+    TelepatWrapper.TelepatClient.on("subscribe", function() {
+        if(callback!==undefined) callback();
     });
     TelepatWrapper.connect(appId, apiKey);
 };

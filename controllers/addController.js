@@ -1,5 +1,6 @@
 var BaseController = require('./baseController').BaseController;
 var TelepatWrapper = require( '../telepat_wrapper.js');
+var async = require('async');
 var AddController = function(helpers, arguments, environment, mainController) {
     BaseController.call(this, helpers, arguments, environment, mainController);
     this.route = "add";
@@ -15,7 +16,7 @@ AddController.prototype.unknownAction = function(route, action) {
 
 exports.AddController = AddController;
 
-AddController.prototype.app = function () {
+AddController.prototype.app = function (callback) {
     var name = this.arguments.name;
     if(name === undefined) {
         console.log("Application name required");
@@ -38,10 +39,11 @@ AddController.prototype.app = function () {
             var appId = response.content.id;
             self.helpers.setEnvKey('appId', appId);
             console.log("Added app with ID: " + appId);
+            if(callback!==undefined) callback();
         });
     });
 };
-AddController.prototype.admin = function() {
+AddController.prototype.admin = function(callback) {
     var email = this.arguments.email;
     var password = this.arguments.password;
     if(email === undefined || password === undefined) {
@@ -59,12 +61,14 @@ AddController.prototype.admin = function() {
         self.helpers.setEnvKey("email", email);
         self.helpers.setEnvKey("password", password);
         setTimeout(function() {
-            self.helpers.login(email, password);
+            self.helpers.login(email, password, function() {
+                if(callback!==undefined) callback();
+            });
         }, 1000);
     });
 };
 
-AddController.prototype.user = function() {
+AddController.prototype.user = function(callback) {
     var appId = this.helpers.retrieveArgument('appId', this.arguments);
     var apiKey = this.helpers.retrieveArgument('apiKey', this.arguments);
     var email = this.helpers.retrieveArgument('telepat_user', this.arguments);
@@ -86,12 +90,13 @@ AddController.prototype.user = function() {
         TelepatWrapper.TelepatClient.user.register(userProfile, function () {
             console.log("User created");
             TelepatWrapper.TelepatClient.disconnect();
+            if(callback!==undefined) callback();
         });
     });
     TelepatWrapper.connect(appId, apiKey);
 };
 
-AddController.prototype.context = function() {
+AddController.prototype.context = function(callback) {
     var appId = this.helpers.retrieveArgument('appId', this.arguments);
     var contextName = this.arguments.contextName;
     if(appId === undefined || contextName === undefined) {
@@ -108,6 +113,36 @@ AddController.prototype.context = function() {
         self.helpers.doTelepatRequest("/admin/context/add", JSON.stringify(post_data), function (response) {
             console.log("Context created: "+JSON.stringify(response.content.id, null, 2));
             self.helpers.setEnvKey("contextId", response.content.id);
+            if(callback!==undefined) callback();
         }, appId);
+    });
+};
+
+AddController.prototype.demoApp = function(cb) {
+    var self = this;
+    async.waterfall([
+        function (callback) {
+            self.arguments.email = "demo_user@telepat.example";
+            self.arguments.password = "testPass";
+            self.mainController.perform('add', 'admin', self.arguments, callback);
+        }, function(callback) {
+            delete self.arguments.email;
+            delete self.arguments.password;
+            self.arguments.name = "Test Application";
+            self.arguments.apiKey = "testApiKey";
+            self.mainController.perform('add', 'app', self.arguments, callback);
+        }, function(callback) {
+            delete self.arguments.name;
+            delete self.arguments.apiKey;
+            self.arguments.filename = __dirname+"/../demo_schema.json";
+            self.mainController.perform('set', 'schema', self.arguments, callback);
+        }, function(callback) {
+            delete self.arguments.filename;
+            self.arguments.contextName = "Demo Context";
+            self.mainController.perform('add', 'context', self.arguments, callback);
+        }
+    ], function() {
+        console.log("Demo app is now set up.");
+        if(cb!==undefined) cb();
     });
 };

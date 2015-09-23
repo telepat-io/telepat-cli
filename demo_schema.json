@@ -1,0 +1,45 @@
+{
+  "appId": 1,
+  "schema": {
+    "comments": {
+      "namespace": "comments",
+      "type": "comments",
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      },
+      "belongsTo": [
+        {
+          "parentModel": "events",
+          "relationType": "hasMany"
+        }
+      ],
+      "read_acl": 6,
+      "write_acl": 6,
+      "meta_read_acl": 6
+    },
+    "events": {
+      "namespace": "events",
+      "type": "events",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "options": {
+          "type": "object"
+        }
+      },
+      "hasMany": [
+        "comments"
+      ],
+      "read_acl": 7,
+      "write_acl": 7,
+      "meta_read_acl": 4,
+      "icon": "fa-image"
+    }
+  }
+}

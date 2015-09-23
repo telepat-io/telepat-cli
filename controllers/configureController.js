@@ -8,7 +8,7 @@ var ConfigureController = function(helpers, arguments, environment, mainControll
 ConfigureController.prototype = Object.create(BaseController.prototype);
 ConfigureController.prototype.constructor = ConfigureController;
 
-ConfigureController.prototype.elasticsearch = function() {
+ConfigureController.prototype.elasticsearch = function(callback) {
     var post_options = {
         host: this.environment.elasticsearch_host===undefined?'127.0.0.1':this.environment.elasticsearch_host,
         port: this.environment.elasticsearch_port===undefined?'9200':this.environment.elasticsearch_port,
@@ -39,7 +39,9 @@ ConfigureController.prototype.elasticsearch = function() {
             }
         }
     });
-    this.helpers.doRequest(post_options,post_data);
+    this.helpers.doRequest(post_options,post_data, function() {
+        if(callback!==undefined) callback();
+    });
 };
 
 exports.ConfigureController = ConfigureController;
