@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "node-localstorage": "0.6.0",
-    "telepat-js": "0.2.0",
+    "telepat-js": "0.2.1",
     "yargs": "^3.25.0"
   },
   "files": [
