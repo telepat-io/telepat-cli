@@ -9,6 +9,7 @@ ConfigureController.prototype = Object.create(BaseController.prototype);
 ConfigureController.prototype.constructor = ConfigureController;
 
 ConfigureController.prototype.elasticsearch = function(callback) {
+    console.log("configuring");
     var post_options = {
         host: this.environment.elasticsearch_host===undefined?'127.0.0.1':this.environment.elasticsearch_host,
         port: this.environment.elasticsearch_port===undefined?'9200':this.environment.elasticsearch_port,
@@ -39,7 +40,8 @@ ConfigureController.prototype.elasticsearch = function(callback) {
             }
         }
     });
-    this.helpers.doRequest(post_options,post_data, function() {
+    this.helpers.doRequest(post_options,post_data, function(chunk) {
+        console.log('Response: ' + JSON.stringify(chunk));
         if(callback!==undefined) callback();
     });
 };

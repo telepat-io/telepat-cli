@@ -25,7 +25,6 @@ SubscribeController.prototype.respond = function (action, callback) {
 
     TelepatWrapper.passEnvironment(this.environment);
     TelepatWrapper.TelepatClient.on("connect", function() {
-        console.log(telepat_user+" "+telepat_user_password);
         TelepatWrapper.TelepatClient.user.login(telepat_user, telepat_user_password);
     });
     TelepatWrapper.TelepatClient.on("login", function() {

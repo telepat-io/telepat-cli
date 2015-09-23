@@ -32,12 +32,17 @@ AddController.prototype.app = function (callback) {
         "keys": keys
     };
     if(keys===null) delete post_data.keys;
+    var apiKey = undefined;
+    if(this.arguments.apiKey !== undefined) {
+        apiKey = keys[0];
+    }
 
     var self=this;
     this.helpers.login(this.environment.email, this.environment.password, function() {
         self.helpers.doTelepatRequest("/admin/app/add", JSON.stringify(post_data), function(response) {
             var appId = response.content.id;
             self.helpers.setEnvKey('appId', appId);
+            self.helpers.setEnvKey('apiKey', apiKey);
             console.log("Added app with ID: " + appId);
             if(callback!==undefined) callback();
         });
