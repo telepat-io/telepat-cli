@@ -1,4 +1,6 @@
 var http = require('http');
+var fs = require('fs');
+
 var environment={
 	telepat_host: undefined,
 	telepat_port: undefined,
@@ -17,7 +19,7 @@ var ls;
 
 if (typeof ls === "undefined" || ls === null) {
   var LocalStorage = require('node-localstorage').LocalStorage;
-  ls = new LocalStorage(__dirname+'/settings-storage');
+  ls = new LocalStorage(getTelepatDir()+'/settings-storage');
 }
 
 function doTelepatRequest(path, post_data, callback, app_id, method) {
@@ -115,6 +117,18 @@ function retrieveArgument(needle, haystack) {
 		value = environment[needle];
 	}
 	return value;
+}
+
+function getUserHome() {
+	return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+}
+
+function getTelepatDir() {
+	var dir = getUserHome() + '/.telepat-cli';
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir,0744);
+	}
+	return getUserHome()+'/.telepat-cli';
 }
 
 exports.doTelepatRequest=doTelepatRequest;

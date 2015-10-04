@@ -1,6 +1,6 @@
 {
   "name": "telepat-cli",
-  "version": "0.1.6",
+  "version": "0.1.13",
   "description": "A CLI tool for working with a Telepat instance",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,11 +23,6 @@
     "telepat-js": "0.2.1",
     "yargs": "^3.25.0"
   },
-  "files": [
-    "index.js",
-    "helpers.js",
-    "telepat_wrapper.js"
-  ],
   "maintainers": [
     {
       "name": "telepat",
