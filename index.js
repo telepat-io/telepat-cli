@@ -10,6 +10,7 @@ var SetController  = require('./lib/setController.js').SetController;
 var SubscribeController  = require('./lib/subscribeController.js').SubscribeController;
 var ListController  = require('./lib/listController.js').ListController;
 var ConfigureController  = require('./lib/configureController.js').ConfigureController;
+var RunController  = require('./lib/runController.js').RunController;
 
 TelepatWrapper.passEnvironment(env_data);
 
@@ -22,4 +23,5 @@ mainController.registeredControllers.push(new SetController(helpers, arguments, 
 mainController.registeredControllers.push(new ListController(helpers, arguments, env_data, mainController));
 mainController.registeredControllers.push(new SubscribeController(helpers, arguments, env_data, mainController));
 mainController.registeredControllers.push(new ConfigureController(helpers, arguments, env_data, mainController));
+mainController.registeredControllers.push(new RunController(helpers, arguments, env_data, mainController));
 mainController.perform(mainAction, secondaryAction, arguments);
