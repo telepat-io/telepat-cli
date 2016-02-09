@@ -50,7 +50,7 @@ AddController.prototype.app = function (callback) {
 };
 AddController.prototype.admin = function(callback) {
     var email = this.arguments.email;
-    var password = this.arguments.password;
+    var password = this.arguments.password.toString();
     if(email === undefined || password === undefined) {
         console.log("Email and password required");
         return;
