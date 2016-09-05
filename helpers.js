@@ -1,5 +1,6 @@
 var http = require('http');
 var fs = require('fs');
+var SHA256 = require('crypto-js/sha256');
 
 var environment={
 	telepat_host: undefined,
