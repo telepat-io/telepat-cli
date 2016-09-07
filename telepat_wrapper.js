@@ -35,7 +35,7 @@ function connect(appId, apiKey) {
     connectOptions.appId = appId;
     connectOptions.apiKey = apiKey;
     connectOptions.apiEndpoint = "http://"+environment.telepat_host+":"+environment.telepat_port;
-    connectOptions.socketEndpoint = "http://"+environment.telepat_host;
+    connectOptions.socketEndpoint = "http://"+environment.telepat_socket_host;
     Telepat.connect(connectOptions);
 }
 
